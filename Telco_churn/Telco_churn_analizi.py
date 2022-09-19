@@ -40,4 +40,34 @@ for i in num_cols:
 #kategorik değişken analizi
 
 def cat_summary(dataframe, col):
-    a = pd.DataFrame
+    a = pd.DataFrame({col: dataframe[col].value_counts(), "Ratio": 100 * dataframe[col].value_counts() / len(dataframe)})
+    return a
+
+cat_summary(df, "Contract")
+
+#hedef değişkene göre nümerik değişkenlerin analizi
+def target_summary(dataframe, target, numerical_col):
+        print(dataframe.groupby(target).agg({numerical_col: "mean"}))
+for col in num_cols:
+
+    target_summary(df, "Churn", col)
+
+
+def outlier_thresholds(dataframe, col_name, q1=0.5, q3=0.95):
+    quartile1 = dataframe[col_name].quantile(q1)
+    quartile3 = dataframe[col_name].quantile(q3)
+    iqr = q3 - q1
+    lower_bound = q1-(iqr * 1.5)
+    upper_bound = q3 + (iqr * 1.5)
+
+    return lower_bound, upper_bound
+low, up =outlier_thresholds(df, "tenure")
+
+def chechk_outliers(dataframe, col):
+    low_limit, up_limit = outlier_thresholds(dataframe, col)
+    if dataframe[(dataframe[col] < low_limit) | (dataframe[col] > up_limit)].any(axis=None):
+        return True
+    else:
+        return False
+for col in df.columns:
+    chechk_outliers(df, col)
